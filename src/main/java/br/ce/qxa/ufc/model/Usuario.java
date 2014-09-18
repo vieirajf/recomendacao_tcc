@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -35,9 +36,20 @@ public class Usuario {
 	@Column(nullable = false)
 	private boolean habilitado;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "papel_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "papel_id"))
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "papel_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "papel_id")
+	)
 	private List<Papel> papeis;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "twitterusuarioid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterUsuarioId_id")
+	)
+	private List<TwitterUsuarioId> amigosId;
+
+	
+	@OneToOne
+	@JoinColumn(name = "autorizacaoTwitter_id")
+	private AutorizacaoTwitter autorizacaoTwitter;
 
 	public Usuario() {
 		super();
@@ -47,15 +59,33 @@ public class Usuario {
 		super();
 		this.senha = senha;
 	}
+
 	
-	public String sha256(String original) throws NoSuchAlgorithmException {
-	    MessageDigest md = MessageDigest.getInstance("SHA-256");
-	    md.update(original.getBytes());
-	    byte[] digest = md.digest();
-	    
-	    return String.copyValueOf(Hex.encode(digest));
-	    //return new String(Hex.encodeHexString(digest));
+	public List<TwitterUsuarioId> getAmigosId() {
+		return amigosId;
 	}
+
+	public void setAmigosId(List<TwitterUsuarioId> amigosId) {
+		this.amigosId = amigosId;
+	}
+
+	public AutorizacaoTwitter getAutorizacaoTwitter() {
+		return autorizacaoTwitter;
+	}
+
+	public void setAutorizacaoTwitter(AutorizacaoTwitter autorizacaoTwitter) {
+		this.autorizacaoTwitter = autorizacaoTwitter;
+	}
+
+	public String sha256(String original) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		md.update(original.getBytes());
+		byte[] digest = md.digest();
+
+		return String.copyValueOf(Hex.encode(digest));
+		// return new String(Hex.encodeHexString(digest));
+	}
+
 	public String getPassword() {
 		return senha;
 	}
