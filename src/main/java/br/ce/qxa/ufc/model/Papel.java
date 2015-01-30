@@ -14,7 +14,7 @@ public class Papel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@Column(nullable = false)
 	private String nome;
@@ -23,17 +23,17 @@ public class Papel {
 		super();
 	}
 
-	public Papel(Long id, String descricao) {
+	public Papel(Integer id, String descricao) {
 		super();
 		this.id = id;
 		this.nome = descricao;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

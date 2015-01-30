@@ -14,21 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import twitter4j.IDs;
-import twitter4j.Paging;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
-import br.ce.qxa.ufc.model.AutorizacaoTwitter;
 import br.ce.qxa.ufc.model.Papel;
-import br.ce.qxa.ufc.model.Pin;
 import br.ce.qxa.ufc.model.Usuario;
 import br.ce.qxa.ufc.repositorio.jpa.GenericRepositoryImpl;
-import br.ce.qxa.ufc.service.GenericService;
 import br.ce.qxa.ufc.service.UsuarioService;
 
 @Controller
@@ -38,15 +26,12 @@ public class UsuarioController {
 	@Inject
 	private UsuarioService usuarioService;
 	
-	@Inject
-	private GenericService<AutorizacaoTwitter> autorizacaoTwitterService;
+	
 	
 	@Inject
 	private GenericRepositoryImpl<Papel> papelService;
 	
-	//private Twitter twitter;
 	
-	private RequestToken requestToken=null;
 
 	@RequestMapping(value = "/adicionar")
 	public String adicionar(ModelMap modelMap) {
@@ -73,7 +58,7 @@ public class UsuarioController {
 			return "usuario/adicionar";
 		}
 		usuario.setHabilitado(true);
-		Long id = new Long(1);
+		Integer id = new Integer(1);
 		Papel papel = papelService.find(Papel.class, id);
 
 		List<Papel> papeis = new ArrayList<Papel>();
@@ -87,143 +72,9 @@ public class UsuarioController {
 
 	}
 
-	@RequestMapping(value = "/autorizacaoTwitter")
-	public String autorizacaoTwitter(@Valid Pin pin,ModelMap modelMap) throws Exception {
-		Usuario usuarioAutorizado = usuarioService.getUsuarioByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-		AccessToken accessToken = null;
-		Twitter twitter = null;
-		
-		try{
-	           if(pin.getPin().length() > 0){
-	        	 accessToken = twitter.getOAuthAccessToken(requestToken, pin.getPin());
-	           }else{
-	             accessToken = twitter.getOAuthAccessToken();
-	           }
-	        } catch (TwitterException te) {
-	          if(401 == te.getStatusCode()){
-	            System.out.println("Não foi possível obter o token de acesso.");
-	          }else{
-	            te.printStackTrace();
-	          }
-	        }
-	      
-		AutorizacaoTwitter autorizacaoTwitter = new AutorizacaoTwitter();
-		autorizacaoTwitter.setId(accessToken.getUserId());
-		autorizacaoTwitter.setToken(accessToken.getToken());
-		autorizacaoTwitter.setTokenSecret(accessToken.getTokenSecret());
-		autorizacaoTwitter.setUsuario(usuarioAutorizado);
-		autorizacaoTwitterService.save(autorizacaoTwitter);
-		
-		usuarioAutorizado.setAutorizacaoTwitter(autorizacaoTwitter);
-		usuarioService.update(usuarioAutorizado);
-		
-		modelMap.addAttribute("usuario",usuarioAutorizado);
-		modelMap.addAttribute("twitter",twitter);
-	return "redirect:/usuario/listar";
-		
-	}
 	
-	public void getIdsUsuariosTwitter(Long idUsuarioTwitter,Twitter twitter) {
-		long cursor = -1;
-        IDs ids = null;
-        User user = null;
-        do {
-            
-          	  //pode usar essa metodo passando como primeiro argumento os id´s e como segundo argumento paginação para retornar os amigos do id repassado.
-                try {
-					ids = twitter.getFriendsIDs(idUsuarioTwitter, cursor);
-				} catch (TwitterException e) {
-					e.printStackTrace();
-				}
-            for (long id : ids.getIDs()) {
-          	  //showuser tem limite de duas vezes por dia
-//          	  try {
-//				user = twitter.showUser(id);
-//			} catch (TwitterException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-          	  
-          	  System.out.println("ID: "+ id);
-//                System.out.println("Nome: "+user.getName());
-                //System.out.println("Quantidades de pessoas: "+user.getFriendsCount());
-                //System.out.println("Status: "+user.getStatus().getText());
-            }
-        } while ((cursor = ids.getNextCursor()) != 0);
-
-	}
 	
-	@RequestMapping(value = "/verificaAcessoTwitter")
-	public String verificaAcessoTwitter(ModelMap modelMap) throws Exception {
-		Usuario usuarioAutorizado = usuarioService.getUsuarioByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-		Twitter twitter;
-		if (usuarioAutorizado.getAutorizacaoTwitter() != null) {
-			twitter = new TwitterFactory().getInstance();
-			twitter.setOAuthConsumer("bVqAzGbuR5jsOTDstph9XB1dM","vi9xVqIc1oMQAydQYIVgbo0GvO4XWwPjdhtJpjAUk6yv19vdDO");
-			 AccessToken accessToken = new AccessToken(usuarioAutorizado.getAutorizacaoTwitter().getToken(), usuarioAutorizado.getAutorizacaoTwitter().getTokenSecret());  
-		      twitter.setOAuthAccessToken(accessToken);
-			getIdsUsuariosTwitter(usuarioAutorizado.getAutorizacaoTwitter().getId(),twitter);
-
-			Integer i = 1;
-			Integer cont = 1;
-			System.out.println("Showing home timeline.");
-			List<Status> statuses = twitter.getUserTimeline(729614881,new Paging(i, 200));
-			while(!statuses.isEmpty()){
-			 // The factory instance is re-useable and thread safe.
-		    //729614881
-			   	for (Status status : statuses) {
-			        System.out.println(cont +": "+status.getUser().getName() + ":" +  status.getText());
-			        cont++;
-			       
-			    }
-		    		        	
-		    i++;
-		     statuses = twitter.getUserTimeline(729614881,new Paging(i, 200));
-			 }
-			return "redirect:/usuario/listar";
-			
-			
-		}	
-		twitter = new TwitterFactory().getInstance();
-		twitter.setOAuthConsumer("bVqAzGbuR5jsOTDstph9XB1dM","vi9xVqIc1oMQAydQYIVgbo0GvO4XWwPjdhtJpjAUk6yv19vdDO");
-
-		requestToken = twitter.getOAuthRequestToken();
-		//AccessToken accessToken = null;
-		String url = requestToken.getAuthorizationURL();
-		System.out.println(url);
-		System.out.println(url);
-		System.out.println(url);
-		System.out.println(url);
-		modelMap.addAttribute("url",url);
-		modelMap.addAttribute("pin", new Pin());
-		return "usuario/autorizacaoTwitter";	
-	}
-	
-	public void getTweets(Twitter twitter){
-		Integer i = 1;
-		Integer cont = 1;
-		System.out.println("Showing home timeline.");
-		List<Status> statuses;
-		try {
-			statuses = twitter.getUserTimeline(729614881,new Paging(i, 200));
-			while(!statuses.isEmpty()){
-				 // The factory instance is re-useable and thread safe.
-			    //729614881
-				   	for (Status status : statuses) {
-				        System.out.println(cont +": "+status.getUser().getName() + ":" +  status.getText());
-				        cont++;
-				       
-				    }
-			    		        	
-			    i++;
-			     statuses = twitter.getUserTimeline(729614881,new Paging(i, 200));
-			}
-		} catch (TwitterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	
-	}
 
 }

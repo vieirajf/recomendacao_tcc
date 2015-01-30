@@ -1,13 +1,10 @@
 package br.ce.qxa.ufc.model;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -17,40 +14,35 @@ public class TwitterUsuarioId {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long Id;
+	private Integer Id;
 	
 	@Column()
-	private Long IdTwitter;
+	private Integer IdTwitter;
 	
 	public TwitterUsuarioId() {
 		super();
 	}
 		
-	public TwitterUsuarioId(Long id, Long idTwitter) {
+	public TwitterUsuarioId(Integer id, Integer idTwitter) {
 		super();
 		Id = id;
 		IdTwitter = idTwitter;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return Id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		Id = id;
 	}
 
-	public Long getIdTwitter() {
+	public Integer getIdTwitter() {
 		return IdTwitter;
 	}
 
-	public void setIdTwitter(Long idTwitter) {
+	public void setIdTwitter(Integer idTwitter) {
 		IdTwitter = idTwitter;
 	}
-
-	
-	
-	
-	
 
 }

@@ -35,9 +35,11 @@
 					<h5 class="panel-title">Autorização do Twitter</h5>
 				</div>
 				<div class="panel-body">
-					<form:form servletRelativeAction="/usuario/autorizacaoTwitter"
+					<form:form servletRelativeAction="/twitter/${id}/autorizacaoTwitter"
 						method="post" modelAttribute="pin" role="form"
 						class="form-horizontal">
+						<input name="requestToken" type="hidden" value="${requestToken}"/>
+						<input name="twitter" type="hidden" value="${twitter}"/>
 						<label>Click no Link abaixo e copie o pin de autorização
 							Twitter no campo Pin</label>
 						<br />

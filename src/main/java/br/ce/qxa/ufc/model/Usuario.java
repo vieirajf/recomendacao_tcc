@@ -25,7 +25,7 @@ public class Usuario {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	@Column(nullable = false)
 	private String login;
@@ -45,7 +45,12 @@ public class Usuario {
 	@JoinTable(name = "twitterusuarioid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterUsuarioId_id")
 	)
 	private List<TwitterUsuarioId> amigosId;
-
+	
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "listaParaRecomendacaoid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "listaParaRecomendacaoid_usuario")
+	)
+	private List<TwitterUsuarioId> listaParaRecomendacao;
 	
 	@OneToOne
 	@JoinColumn(name = "autorizacaoTwitter_id")
@@ -61,6 +66,7 @@ public class Usuario {
 	}
 
 	
+
 	public List<TwitterUsuarioId> getAmigosId() {
 		return amigosId;
 	}
@@ -99,11 +105,11 @@ public class Usuario {
 		}
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
