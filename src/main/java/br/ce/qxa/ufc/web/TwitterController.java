@@ -24,8 +24,10 @@ import twitter4j.auth.RequestToken;
 import br.ce.qxa.ufc.model.AutorizacaoTwitter;
 import br.ce.qxa.ufc.model.AutorizacaoTwitterRequest;
 import br.ce.qxa.ufc.model.Pin;
+import br.ce.qxa.ufc.model.TwitterUsuarioId;
 import br.ce.qxa.ufc.model.Usuario;
 import br.ce.qxa.ufc.service.GenericService;
+import br.ce.qxa.ufc.service.TwitterUsuarioIdService;
 import br.ce.qxa.ufc.service.UsuarioService;
 
 @Controller
@@ -39,24 +41,23 @@ public class TwitterController {
 	private GenericService<AutorizacaoTwitter> autorizacaoTwitterService;
 	
 	@Inject
+	private TwitterUsuarioIdService twitterUsuarioIdService;
+	
+	@Inject
 	private GenericService<AutorizacaoTwitterRequest> autorizacaoTwitterRequestService;
 				
-		/**
-		 * Grava a autorização para o programa acessar a conta do twitter gerando um token, tokenSecret.
-		 * 
-		 */
-	//tem que receber o request token
+	/**
+	 * Grava a autorização para o programa acessar a conta do twitter gerando um token, tokenSecret.
+	 * 
+	 */
 	@RequestMapping(value = "/{id}/autorizacaoTwitter")
 	public String autorizacaoTwitter(@PathVariable("id") Integer id,@Valid Pin pin,ModelMap modelMap)  {
+	
 		AutorizacaoTwitterRequest autorizacaoTwitterRequest = autorizacaoTwitterRequestService.find(AutorizacaoTwitterRequest.class, id);
-		System.out.println(pin.getPin());
 		Usuario usuarioAutorizado = usuarioService.getUsuarioByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-		
 		Twitter twitter = autorizacaoTwitterRequest.getTwitter();
 		RequestToken requestToken = autorizacaoTwitterRequest.getRequestToken();
-		
 		AccessToken accessToken = null;
-		
 		
 		try{
 		      if(pin.getPin().length() > 0){
@@ -91,34 +92,46 @@ public class TwitterController {
 		
 	}
 	
-	public List<Long> getIdsUsuariosTwitter(Long idUsuarioTwitter,Twitter twitter) throws TwitterException {
+	public List<TwitterUsuarioId> getIdsUsuariosTwitter(Long idUsuarioTwitter,Twitter twitter) throws TwitterException {
 		long cursor = -1;
-		List<Long> listaDeId = new ArrayList<Long>();
+		List<TwitterUsuarioId> listaDeId = new ArrayList<TwitterUsuarioId>();
         IDs ids = null;
         User user = null;
         do {
-            
-          	  //pode usar essa metodo passando como primeiro argumento os id´s e como segundo argumento paginação para retornar os amigos do id repassado.
-                
-					ids = twitter.getFriendsIDs(idUsuarioTwitter, cursor);
-				
-            for (long id : ids.getIDs()) {
-          	  //showuser tem limite de duas vezes por dia
-//          	  try {
-//				user = twitter.showUser(id);
-//			} catch (TwitterException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-          	  listaDeId.add(id);
-          	  System.out.println("ID: "+ id);
-//                System.out.println("Nome: "+user.getName());
-                //System.out.println("Quantidades de pessoas: "+user.getFriendsCount());
-                //System.out.println("Status: "+user.getStatus().getText());
+            //pode usar essa metodo passando como primeiro argumento os id´s e 
+        	//como segundo argumento paginação para retornar os amigos do id repassado.
+            ids = twitter.getFriendsIDs(idUsuarioTwitter, cursor);
+			for (long id : ids.getIDs()) {
+			  TwitterUsuarioId idNovo = twitterUsuarioIdService.getTwitterUsuarioIdByIdTwitter(id);
+			  if (idNovo==null){
+				  idNovo= new TwitterUsuarioId();
+				  idNovo.setIdTwitter(id);
+				  twitterUsuarioIdService.save(idNovo);
+			  }
+			  
+          	  listaDeId.add(idNovo);
             }
         } while ((cursor = ids.getNextCursor()) != 0);
         return listaDeId;
 	}
+	
+	public void cadastroIdTwitterAmigos1E2Grau(Usuario usuario,Twitter twitter){
+		Long idUsuario = (long)usuario.getAutorizacaoTwitter().getId();
+		try {
+			List<TwitterUsuarioId> idAmigos = new ArrayList<TwitterUsuarioId>(); 
+					idAmigos = getIdsUsuariosTwitter(idUsuario,twitter);
+			usuarioService.CadastraIdAmigos(idAmigos, usuario.getId());
+//			for (TwitterUsuarioId id :idAmigos ) {
+//				List<TwitterUsuarioId> idAmigos2 = getIdsUsuariosTwitter(id.getIdTwitter(),twitter);
+//				usuarioService.CadastraIdsParaRecomadacao(idAmigos2, idU);
+//			}
+			//getTweets(twitter);
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	
 	/**
 	 * 
@@ -137,13 +150,7 @@ public class TwitterController {
 			twitter.setOAuthConsumer("bVqAzGbuR5jsOTDstph9XB1dM","vi9xVqIc1oMQAydQYIVgbo0GvO4XWwPjdhtJpjAUk6yv19vdDO");
 			 AccessToken accessToken = new AccessToken(usuarioAutorizado.getAutorizacaoTwitter().getToken(), usuarioAutorizado.getAutorizacaoTwitter().getTokenSecret());  
 		      twitter.setOAuthAccessToken(accessToken);
-			try {
-				getIdsUsuariosTwitter((long)usuarioAutorizado.getAutorizacaoTwitter().getId(),twitter);
-				getTweets(twitter);
-			} catch (TwitterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		      cadastroIdTwitterAmigos1E2Grau(usuarioAutorizado ,twitter);
 			
 			return "redirect:/usuario/listar";
 		}	

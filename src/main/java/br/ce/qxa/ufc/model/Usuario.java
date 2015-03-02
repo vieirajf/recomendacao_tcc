@@ -2,6 +2,7 @@ package br.ce.qxa.ufc.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -37,13 +38,11 @@ public class Usuario {
 	private boolean habilitado;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "papel_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "papel_id")
-	)
+	@JoinTable(name = "papel_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "papel_id"))
 	private List<Papel> papeis;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "twitterusuarioid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterUsuarioId_id")
-	)
+	@JoinTable(name = "twitterusuarioid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterusuarioid_id"))
 	private List<TwitterUsuarioId> amigosId;
 	
 	
@@ -67,7 +66,17 @@ public class Usuario {
 
 	
 
+	public List<TwitterUsuarioId> getListaParaRecomendacao() {
+		return listaParaRecomendacao;
+	}
+
+	public void setListaParaRecomendacao(
+			List<TwitterUsuarioId> listaParaRecomendacao) {
+		this.listaParaRecomendacao = listaParaRecomendacao;
+	}
+
 	public List<TwitterUsuarioId> getAmigosId() {
+		if (amigosId==null) return new ArrayList<TwitterUsuarioId>() ;
 		return amigosId;
 	}
 

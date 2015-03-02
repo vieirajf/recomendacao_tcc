@@ -14,35 +14,31 @@ public class TwitterUsuarioId {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer Id;
+	private Integer id;
 	
-	@Column()
-	private Integer IdTwitter;
+	@Column(unique=true )
+	private Long idTwitter;
 	
 	public TwitterUsuarioId() {
 		super();
 	}
-		
-	public TwitterUsuarioId(Integer id, Integer idTwitter) {
-		super();
-		Id = id;
-		IdTwitter = idTwitter;
-	}
 
 	public Integer getId() {
-		return Id;
+		return id;
 	}
 
 	public void setId(Integer id) {
-		Id = id;
+		this.id = id;
 	}
 
-	public Integer getIdTwitter() {
-		return IdTwitter;
+	public Long getIdTwitter() {
+		return idTwitter;
 	}
 
-	public void setIdTwitter(Integer idTwitter) {
-		IdTwitter = idTwitter;
+	public void setIdTwitter(Long idTwitter) {
+		this.idTwitter = idTwitter;
 	}
 
+		
+	
 }

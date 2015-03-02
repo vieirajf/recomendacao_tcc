@@ -32,6 +32,7 @@ public class UsuarioController {
 	private GenericRepositoryImpl<Papel> papelService;
 	
 	
+	
 
 	@RequestMapping(value = "/adicionar")
 	public String adicionar(ModelMap modelMap) {
