@@ -25,15 +25,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements U
 
 
 	@Override
-	public void CadastraIdAmigos(List<TwitterUsuarioId> amigosId,	Integer idUsuario) {
-		usuarioRespositorio.CadastraIdAmigos(amigosId, idUsuario);		
+	public Usuario CadastraIdAmigos(List<TwitterUsuarioId> amigosId,	Integer idUsuario) {
+		return usuarioRespositorio.CadastraIdAmigos(amigosId, idUsuario);		
 	}
 
 
 
 	@Override
-	public void CadastraIdsParaRecomadacao(List<TwitterUsuarioId> listaParaRecomendacao, Integer idUsuario) {
-		usuarioRespositorio.CadastraIdsParaRecomadacao(listaParaRecomendacao, idUsuario);
+	public Usuario CadastraIdsParaRecomadacao(List<TwitterUsuarioId> idAmigos2, Usuario usuario) {
+		return usuarioRespositorio.CadastraIdsParaRecomadacao(idAmigos2, usuario);
 		
 	}
 

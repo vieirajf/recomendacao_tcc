@@ -26,34 +26,35 @@ public class UsuarioRepositorioImpl extends GenericRepositoryImpl<Usuario> imple
 	}
 
 	@Override
-	public void CadastraIdAmigos(List<TwitterUsuarioId> amigosId, Integer idUsuario) {
+	public Usuario CadastraIdAmigos(List<TwitterUsuarioId> amigosId, Integer idUsuario) {
 		Usuario usuario = find(Usuario.class, idUsuario);
-		List<TwitterUsuarioId> result = new ArrayList<TwitterUsuarioId>();
-		result = usuario.getAmigosId();
+		List<TwitterUsuarioId> listaDeAmigos = new ArrayList<TwitterUsuarioId>();
+		listaDeAmigos = usuario.getAmigosId();
 		for (TwitterUsuarioId twitterUsuarioId : amigosId) {
 			
-				if (!result.contains(twitterUsuarioId)) {
+				if (!listaDeAmigos.contains(twitterUsuarioId)) {
 					
-					result.add(twitterUsuarioId);
+					listaDeAmigos.add(twitterUsuarioId);
 					System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 				}
 		}
-		usuario.setAmigosId(result);
-		
-		save(usuario);
-		
+		usuario.setAmigosId(listaDeAmigos);
+		return usuario;		
 	}
 
 	@Override
-	public void CadastraIdsParaRecomadacao(List<TwitterUsuarioId> listaParaRecomendacao, Integer idUsuario) {
-		Usuario usuario = find(Usuario.class, idUsuario);
-		List<TwitterUsuarioId> result = usuario.getListaParaRecomendacao();
-		for (TwitterUsuarioId twitterUsuarioId : listaParaRecomendacao) {
-			if (!result.contains(twitterUsuarioId)){
-				usuario.getListaParaRecomendacao().add(twitterUsuarioId);
+	public Usuario CadastraIdsParaRecomadacao(List<TwitterUsuarioId> idAmigos2, Usuario usuario) { 
+		List<TwitterUsuarioId> listaParaRecomendacao = usuario.getListaParaRecomendacao();
+		for (TwitterUsuarioId twitterUsuarioId : idAmigos2) {
+			if (!listaParaRecomendacao.contains(twitterUsuarioId)){
+				if(!usuario.getAmigosId().contains(twitterUsuarioId)){
+					listaParaRecomendacao.add(twitterUsuarioId);
+				}
+				
 			}
 		}
-		update(usuario);
+		usuario.setListaParaRecomendacao(listaParaRecomendacao);;
+		return usuario;
 		
 	}
 

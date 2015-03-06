@@ -7,6 +7,6 @@ import br.ce.qxa.ufc.model.Usuario;
 
 public interface UsuarioRepositorio  extends GenericRepository<Usuario>{
 	public abstract Usuario getUsuarioByLogin(String login);
-	public abstract void CadastraIdAmigos(List<TwitterUsuarioId> amigosId, Integer idUsuario);
-	public abstract void CadastraIdsParaRecomadacao(List<TwitterUsuarioId> listaParaRecomendacao,Integer idUsuario);
+	public abstract Usuario CadastraIdAmigos(List<TwitterUsuarioId> amigosId, Integer idUsuario);
+	public abstract Usuario CadastraIdsParaRecomadacao(List<TwitterUsuarioId> idAmigos2,Usuario usuario);
 }

@@ -120,11 +120,14 @@ public class TwitterController {
 		try {
 			List<TwitterUsuarioId> idAmigos = new ArrayList<TwitterUsuarioId>(); 
 					idAmigos = getIdsUsuariosTwitter(idUsuario,twitter);
-			usuarioService.CadastraIdAmigos(idAmigos, usuario.getId());
-//			for (TwitterUsuarioId id :idAmigos ) {
-//				List<TwitterUsuarioId> idAmigos2 = getIdsUsuariosTwitter(id.getIdTwitter(),twitter);
-//				usuarioService.CadastraIdsParaRecomadacao(idAmigos2, idU);
-//			}
+			usuario = usuarioService.CadastraIdAmigos(idAmigos, usuario.getId());
+			usuarioService.save(usuario);
+			for (TwitterUsuarioId id :idAmigos ) {
+				List<TwitterUsuarioId> idAmigos2 = new ArrayList<TwitterUsuarioId>();
+				idAmigos2 = getIdsUsuariosTwitter(id.getIdTwitter(),twitter);
+				usuario = usuarioService.CadastraIdsParaRecomadacao(idAmigos2, usuario);
+			}
+			usuarioService.save(usuario);
 			//getTweets(twitter);
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block

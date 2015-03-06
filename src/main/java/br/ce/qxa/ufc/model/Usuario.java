@@ -42,12 +42,12 @@ public class Usuario {
 	private List<Papel> papeis;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "twitterusuarioid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterusuarioid_id"))
+	@JoinTable(name = "twitterUsuarioId_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "twitterUsuarioId_id"))
 	private List<TwitterUsuarioId> amigosId;
 	
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "listaParaRecomendacaoid_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "listaParaRecomendacaoid_usuario")
+	@JoinTable(name = "listaParaRecomendacao_usuario", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "listaParaRecomendacao_id")
 	)
 	private List<TwitterUsuarioId> listaParaRecomendacao;
 	
